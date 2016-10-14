@@ -1,22 +1,30 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <title>Frame Figure</title>
-    <style>
-        body {
-            padding: 0;
-            background-color: #333333;
-        }
+  <meta charset="UTF-8">
+  <title>Frame Figure</title>
+  <style>
+    body {
+      padding: 0;
+      background-color: #333333;
+    }
 
-        .container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%%;
-            height: 100%%;
-        }
-    </style>
+    .container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .container .edge {
+      cursor: pointer;
+    }
+
+    .container .edge:hover > g {
+      stroke-width: 3px;
+    }
+  </style>
 </head>
 <body>
 <div class="container">
