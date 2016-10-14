@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Frame Figure</title>
+  <link rel="stylesheet" href="lib/codeflask.css">
+  <link rel="stylesheet" href="lib/prism.css">
   <style>
     body {
       margin: 0;
@@ -54,6 +56,31 @@
     .modal.show .modal-backdrop {
       visibility: visible;
       opacity: 1;
+    }
+
+    .modal .modal-content #source-code-editor {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background-color: #272822;
+    }
+
+    .modal .modal-content #source-code-editor textarea {
+      color: #fff;
+    }
+
+    .CodeFlask__textarea, .CodeFlask__pre {
+      font-size: 18px;
+      padding-left: 3.8em!important;
+    }
+
+    .modal .modal-content #source-code-editor code[class*="language-"] {
+      white-space: pre-wrap!important;
+    }
+
+    .modal .modal-content .line-highlight {
+      margin-top: .8em;
+      background: linear-gradient(to right, hsla(199, 20%, 50%, 0.32) 70%, hsla(24, 20%, 50%,0));
     }
   </style>
 </head>
@@ -9698,12 +9725,14 @@ def figure_frame(out='figure.html'):
         del stack, graph
 
 </script>
+<script type="text/javascript" src="lib/codeflask.js"></script>
+<script type="text/javascript" src="lib/prism.js"></script>
 <script type="text/javascript">
 /**
  * Thanks the contribution made by PeachScript <https://github.com/PeachScript>!
  */
 
-function enableZoomForElm(elm, step, max, min) {
+function EnableZoomForElm(elm, step, max, min) {
   var prefixs = ['webkitTransform', 'mozTransform', 'msTransform', 'oTransform', 'transform'];
   step = step || .1;
 
@@ -9770,43 +9799,49 @@ function hotKeyBind (key, cb, elm) {
   });
 }
 
-function modal () {
+function Modal () {
   var container = document.createElement('div');
   var content = document.createElement('div');
   var backdrop = document.createElement('div');
 
   container.setAttribute('modal-id', new Date().getTime());
-  container.className = 'modal';
-  content.className = 'modal-content';
-  backdrop.className = 'modal-backdrop';
+  container.classList.add('modal');
+  content.classList.add('modal-content');
+  backdrop.classList.add('modal-backdrop');
 
   container.appendChild(content);
   container.appendChild(backdrop);
   document.body.appendChild(container);
 
   backdrop.addEventListener('click', function () {
-    container.className = 'modal';
+    container.classList.remove('show');
   });
 
   return {
     show: function () {
-      container.className += ' show';
+      container.classList.add('show');
+      return this;
     },
     hide: function () {
-      container.className = 'modal';
+      container.classList.remove('show');
+      return this;
     },
     setContent: function (html) {
       content.innerHTML = html;
+      return this;
     }
   };
 }
 
-var zoomIns = new enableZoomForElm(document.getElementById('svg-wrapper'));
+var zoomIns = new EnableZoomForElm(document.getElementById('svg-wrapper'));
 hotKeyBind('=', zoomIns.zoomIn);
 hotKeyBind('-', zoomIns.zoomOut);
 hotKeyBind('0', zoomIns.resetScale);
 
-var modal = new modal();
+var modal = new Modal;
+var flask = new CodeFlask;
+modal.setContent('<div id="source-code-editor">1231</div>');
+flask.run('#source-code-editor', { language: 'python' });
 hotKeyBind('esc', modal.hide);
 
 var sourceCode = (function () {
@@ -9821,9 +9856,13 @@ var sourceCode = (function () {
   return result;
 })();
 
-function openFile (url) {
-  modal.setContent(sourceCode[url].innerHTML);
+function openFile (url, line) {
+  document.getElementById('source-code-editor')
+          .getElementsByTagName('pre')[0].setAttribute('data-line', line + 1);
+  flask.update(sourceCode[url].innerHTML);
   modal.show();
+  document.getElementById('source-code-editor')
+          .getElementsByTagName('textarea')[0].scrollTop = parseInt(document.getElementsByClassName(' line-highlight')[0].style.top);
 }
 </script>
 
