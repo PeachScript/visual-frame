@@ -9735,7 +9735,14 @@ def figure_frame(out='figure.html'):
  * Thanks the contribution made by PeachScript <https://github.com/PeachScript>!
  */
 
-function EnableZoomForElm(elm, step, max, min) {
+/**
+ * enable zoom feature for some element
+ * @param {DOM}    elm  target element
+ * @param {Number} step zoom step, default: 0.1
+ * @param {Number} max  maximum zoom value
+ * @param {Number} min  minimum zoom value, default: 0
+ */
+function enableZoomForElm(elm, step, max, min) {
   var prefixs = ['webkitTransform', 'mozTransform', 'msTransform', 'oTransform', 'transform'];
   step = step || .1;
 
@@ -9788,6 +9795,12 @@ function EnableZoomForElm(elm, step, max, min) {
   };
 }
 
+/**
+ * hot key bind function
+ * @param  {String}   key target key name
+ * @param  {Function} cb  callback
+ * @param  {DOM}      elm the element which be used listen keydown event
+ */
 function hotKeyBind (key, cb, elm) {
   var keyMapping = {
     '0': 48,
@@ -9797,11 +9810,15 @@ function hotKeyBind (key, cb, elm) {
   };
   (elm || window).addEventListener('keydown', function (ev) {
     if ((ev || event).keyCode === keyMapping[key]) {
-      cb.call(null);
+      cb();
     }
   });
 }
 
+/**
+ * Modal Class
+ * @return {Object} Modal Instance
+ */
 function Modal () {
   var container = document.createElement('div');
   var content = document.createElement('div');
@@ -9836,16 +9853,19 @@ function Modal () {
   };
 }
 
-var zoomIns = new EnableZoomForElm(document.getElementById('svg-wrapper'));
-hotKeyBind('=', zoomIns.zoomIn);
-hotKeyBind('-', zoomIns.zoomOut);
-hotKeyBind('0', zoomIns.resetScale);
+var zoomHandler = new enableZoomForElm(document.getElementById('svg-wrapper'));
+hotKeyBind('=', zoomHandler.zoomIn);
+hotKeyBind('-', zoomHandler.zoomOut);
+hotKeyBind('0', zoomHandler.resetScale);
 
 var modal = new Modal;
+modal.setContent('<div id="source-code-editor"></div>');
+
 var flask = new CodeFlask;
-modal.setContent('<div id="source-code-editor">1231</div>');
 flask.run('#source-code-editor', { language: 'python' });
 hotKeyBind('esc', modal.hide);
+document.getElementById('source-code-editor')
+        .getElementsByTagName('pre')[0].classList.add('line-numbers');
 
 var sourceCode = (function () {
   var all = document.getElementsByTagName('script');
@@ -9859,13 +9879,20 @@ var sourceCode = (function () {
   return result;
 })();
 
+/**
+ * open file function
+ * @param  {String} url  source code file url
+ * @param  {Number} line line number
+ */
 function openFile (url, line) {
   document.getElementById('source-code-editor')
-          .getElementsByTagName('pre')[0].setAttribute('data-line', line + 1);
+          .getElementsByTagName('pre')[0]
+          .setAttribute('data-line', line + 1);
   flask.update(sourceCode[url].innerHTML);
   modal.show();
   document.getElementById('source-code-editor')
-          .getElementsByTagName('textarea')[0].scrollTop = parseInt(document.getElementsByClassName(' line-highlight')[0].style.top);
+          .getElementsByTagName('textarea')[0]
+          .scrollTop = parseInt(document.getElementsByClassName(' line-highlight')[0].style.top);
 }
 </script>
 
