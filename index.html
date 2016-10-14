@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Frame Figure</title>
-  <link rel="stylesheet" href="lib/codeflask.css">
   <link rel="stylesheet" href="lib/prism.css">
   <style>
     body {
@@ -62,25 +61,18 @@
       position: relative;
       width: 100%;
       height: 100%;
-      background-color: #272822;
-    }
-
-    .modal .modal-content #source-code-editor textarea {
-      color: #fff;
-    }
-
-    .CodeFlask__textarea, .CodeFlask__pre {
       font-size: 18px;
-      padding-left: 3.8em!important;
-    }
-
-    .modal .modal-content #source-code-editor code[class*="language-"] {
-      white-space: pre-wrap!important;
+      background-color: #272822;
+      overflow: auto;
     }
 
     .modal .modal-content .line-highlight {
-      margin-top: .8em;
+      margin-top: .9em;
       background: linear-gradient(to right, hsla(199, 20%, 50%, 0.32) 70%, hsla(24, 20%, 50%,0));
+    }
+
+    .line-numbers .line-numbers-rows {
+      top: -3px;
     }
   </style>
   <script>
@@ -9728,7 +9720,6 @@ def figure_frame(out='figure.html'):
         del stack, graph
 
 </script>
-<script type="text/javascript" src="lib/codeflask.js"></script>
 <script type="text/javascript" src="lib/prism.js"></script>
 <script type="text/javascript">
 /**
@@ -9859,17 +9850,13 @@ hotKeyBind('-', zoomHandler.zoomOut);
 hotKeyBind('0', zoomHandler.resetScale);
 
 var modal = new Modal;
-modal.setContent('<div id="source-code-editor"></div>');
-
-var flask = new CodeFlask;
-flask.run('#source-code-editor', { language: 'python' });
+modal.setContent('<div id="source-code-editor"><pre class="line-numbers"><code class="language-python"></code></pre></div>');
 hotKeyBind('esc', modal.hide);
-document.getElementById('source-code-editor')
-        .getElementsByTagName('pre')[0].classList.add('line-numbers');
 
+var sourceCodeContainer = document.getElementById('source-code-editor');
 
 // Disable double scroll for outer element
-document.getElementById('source-code-editor').getElementsByTagName('textarea')[0].addEventListener('mousewheel', function (ev) {
+sourceCodeContainer.addEventListener('mousewheel', function (ev) {
   var elm = ev.currentTarget;
   var scrollTop = elm.scrollTop;
   var scrollHeight = elm.scrollHeight;
@@ -9903,14 +9890,12 @@ var sourceCode = (function () {
  * @param  {Number} line line number
  */
 function openFile (url, line) {
-  document.getElementById('source-code-editor')
-          .getElementsByTagName('pre')[0]
-          .setAttribute('data-line', line + 1);
-  flask.update(sourceCode[url].innerHTML);
+  sourceCodeContainer.getElementsByTagName('pre')[0]
+                     .setAttribute('data-line', line + 1);
+  sourceCodeContainer.getElementsByTagName('code')[0].innerHTML = sourceCode[url].innerHTML;
+  Prism.highlightAll();
   modal.show();
-  document.getElementById('source-code-editor')
-          .getElementsByTagName('textarea')[0]
-          .scrollTop = parseInt(document.getElementsByClassName(' line-highlight')[0].style.top);
+  sourceCodeContainer.scrollTop = parseInt(document.getElementsByClassName('line-highlight')[0].style.top) - 100;
 }
 </script>
 
