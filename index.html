@@ -9867,6 +9867,24 @@ hotKeyBind('esc', modal.hide);
 document.getElementById('source-code-editor')
         .getElementsByTagName('pre')[0].classList.add('line-numbers');
 
+
+// Disable double scroll for outer element
+document.getElementById('source-code-editor').getElementsByTagName('textarea')[0].addEventListener('mousewheel', function (ev) {
+  var elm = ev.currentTarget;
+  var scrollTop = elm.scrollTop;
+  var scrollHeight = elm.scrollHeight;
+  var height = elm.clientHeight;
+  var event = ev.originalEvent || ev;
+
+  var delta = (event.wheelDelta) ? event.wheelDelta : -(event.detail || 0);
+
+  if ((delta > 0 && scrollTop <= delta) ||
+      (delta < 0 && scrollHeight - height - scrollTop <= -1 * delta)) {
+    elm.scrollTop = delta > 0 ? 0 : scrollHeight;
+    event.preventDefault();
+  }
+});
+
 var sourceCode = (function () {
   var all = document.getElementsByTagName('script');
   var result = {};
