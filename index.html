@@ -5,16 +5,8 @@
   <title>Frame Figure</title>
   <style>
     body {
-      padding: 0;
+      margin: 0;
       background-color: #333333;
-    }
-
-    .container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
     }
 
     .container .edge {
@@ -23,6 +15,45 @@
 
     .container .edge:hover > g {
       stroke-width: 3px;
+    }
+
+    .modal-content {
+      position: fixed;
+      z-index: 100;
+      top: 50px;
+      left: 100px;
+      right: 100px;
+      bottom: 100px;
+      background-color: #fff;
+      box-shadow: 0 20px 80px rgba(0,0,0,.3);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-100px);
+      transition: all .6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .modal.show .modal-content {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .modal .modal-backdrop {
+      position: absolute;
+      z-index: 99;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,.1);
+      opacity: 0;
+      transition: all .6s;
+      visibility: hidden;
+    }
+
+    .modal.show .modal-backdrop {
+      visibility: visible;
+      opacity: 1;
     }
   </style>
 </head>
@@ -644,83 +675,6 @@
 
   </div>
 </div>
-<script type="text/javascript">
-/**
- * Thanks the contribution made by PeachScript <https://github.com/PeachScript>!
- */
-
-function enableZoomForElm(elm, step, max, min) {
-  var prefixs = ['webkitTransform', 'mozTransform', 'msTransform', 'oTransform', 'transform'];
-  step = step || .1;
-
-  prefixs.forEach(function (item) {
-    elm.style[item + 'Origin'] = 'top left';
-  });
-
-  function getScale () {
-    var styles = getComputedStyle(elm);
-    var scale = parseFloat((styles.transform.match(/matrix\((-?\d*\.?\d+),\s*0,\s*0,\s*(-?\d*\.?\d+),\s*0,\s*0\)/) || [])[1]);
-    return isNaN(scale) ? 1 : scale;
-  }
-
-  function setScale (target) {
-    prefixs.forEach(function (item) {
-      var current = elm.style[item] || '';
-      var scale = parseFloat((current.match(/scale\((\d.?\d?)\)/) || [])[1]);
-
-      if (isNaN(scale)) {
-        elm.style[item] = 'scale(' + target + ')';
-      } else {
-        elm.style[item] = current.replace(/scale\(\d.?\d?\)/, 'scale(' + target + ')');
-      }
-    });
-  }
-
-  return {
-    zoomIn: function () {
-      var target = getScale() + step;
-      if (max === undefined || target < max) {
-        setScale(target);
-      }
-      return this;
-    },
-    zoomOut: function () {
-      var target = getScale() - step;
-      if (target > (min || 0)) {
-        setScale(target);
-      }
-      return this;
-    },
-    setScale: function (target) {
-      setScale(target);
-      return this;
-    },
-    resetScale: function () {
-      setScale(1);
-      return this;
-    }
-  };
-}
-
-function hotKeyBind (key, cb, elm) {
-  var keyMapping = {
-    '0': 48,
-    '-': 189,
-    '=': 187
-  };
-  (elm || window).addEventListener('keydown', function (ev) {
-    if ((ev || event).keyCode === keyMapping[key]) {
-      cb.call(null);
-    }
-  });
-}
-
-var zoomIns = new enableZoomForElm(document.getElementById('svg-wrapper'));
-hotKeyBind('=', zoomIns.zoomIn);
-hotKeyBind('-', zoomIns.zoomOut);
-hotKeyBind('0', zoomIns.resetScale);
-</script>
-
 <script type="text/plain" data-source="/bin/salt-minion">
 #!/usr/bin/python
 '''
@@ -9743,6 +9697,134 @@ def figure_frame(out='figure.html'):
     finally:
         del stack, graph
 
+</script>
+<script type="text/javascript">
+/**
+ * Thanks the contribution made by PeachScript <https://github.com/PeachScript>!
+ */
+
+function enableZoomForElm(elm, step, max, min) {
+  var prefixs = ['webkitTransform', 'mozTransform', 'msTransform', 'oTransform', 'transform'];
+  step = step || .1;
+
+  prefixs.forEach(function (item) {
+    elm.style[item + 'Origin'] = 'top left';
+  });
+
+  function getScale () {
+    var styles = getComputedStyle(elm);
+    var scale = parseFloat((styles.transform.match(/matrix\((-?\d*\.?\d+),\s*0,\s*0,\s*(-?\d*\.?\d+),\s*0,\s*0\)/) || [])[1]);
+    return isNaN(scale) ? 1 : scale;
+  }
+
+  function setScale (target) {
+    prefixs.forEach(function (item) {
+      var current = elm.style[item] || '';
+      var scale = parseFloat((current.match(/scale\((\d.?\d?)\)/) || [])[1]);
+
+      if (isNaN(scale)) {
+        elm.style[item] = 'scale(' + target + ')';
+      } else {
+        elm.style[item] = current.replace(/scale\(\d.?\d?\)/, 'scale(' + target + ')');
+      }
+    });
+  }
+
+  return {
+    zoomIn: function () {
+      var target = getScale() + step;
+      if (max === undefined || target < max) {
+        setScale(target);
+      }
+      return this;
+    },
+    zoomOut: function () {
+      var target = getScale() - step;
+      if (target > (min || 0)) {
+        setScale(target);
+      }
+      return this;
+    },
+    setScale: function (target) {
+      setScale(target);
+      return this;
+    },
+    resetScale: function () {
+      setScale(1);
+      return this;
+    }
+  };
+}
+
+function hotKeyBind (key, cb, elm) {
+  var keyMapping = {
+    '0': 48,
+    '-': 189,
+    '=': 187,
+    'esc': 27
+  };
+  (elm || window).addEventListener('keydown', function (ev) {
+    if ((ev || event).keyCode === keyMapping[key]) {
+      cb.call(null);
+    }
+  });
+}
+
+function modal () {
+  var container = document.createElement('div');
+  var content = document.createElement('div');
+  var backdrop = document.createElement('div');
+
+  container.setAttribute('modal-id', new Date().getTime());
+  container.className = 'modal';
+  content.className = 'modal-content';
+  backdrop.className = 'modal-backdrop';
+
+  container.appendChild(content);
+  container.appendChild(backdrop);
+  document.body.appendChild(container);
+
+  backdrop.addEventListener('click', function () {
+    container.className = 'modal';
+  });
+
+  return {
+    show: function () {
+      container.className += ' show';
+    },
+    hide: function () {
+      container.className = 'modal';
+    },
+    setContent: function (html) {
+      content.innerHTML = html;
+    }
+  };
+}
+
+var zoomIns = new enableZoomForElm(document.getElementById('svg-wrapper'));
+hotKeyBind('=', zoomIns.zoomIn);
+hotKeyBind('-', zoomIns.zoomOut);
+hotKeyBind('0', zoomIns.resetScale);
+
+var modal = new modal();
+hotKeyBind('esc', modal.hide);
+
+var sourceCode = (function () {
+  var all = document.getElementsByTagName('script');
+  var result = {};
+  Array.prototype.forEach.call(all, function (item) {
+    if (item.hasAttribute('data-source')) {
+      result[item.getAttribute('data-source')] = item;
+    }
+  });
+
+  return result;
+})();
+
+function openFile (url) {
+  modal.setContent(sourceCode[url].innerHTML);
+  modal.show();
+}
 </script>
 
 </body>
